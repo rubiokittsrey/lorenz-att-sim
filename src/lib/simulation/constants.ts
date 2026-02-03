@@ -3,39 +3,39 @@ import { CameraAngles, CameraPan, LorenzParams, Point3D } from './types';
 export const pathColors = {
     orange: {
         className: 'bg-orange-500',
-        darker: '#9f2d00',
-        mid: '#ff6900',
-        lighter: '#ffb86a',
+        darker: '#ca3500',
+        mid: '#ff8904',
+        lighter: '#ffedd4',
     },
     red: {
         className: 'bg-red-500',
-        darker: '#9f0712',
+        darker: '#82181a',
         mid: '#fb2c36',
-        lighter: '#ffa2a2',
+        lighter: '#82181a',
     },
     blue: {
         className: 'bg-blue-500',
-        darker: '#193cb8',
-        mid: '#2b7fff',
-        lighter: '#8ec5ff',
+        darker: '#1447e6',
+        mid: '#51a2ff',
+        lighter: '#dbeafe',
     },
     green: {
         className: 'bg-green-500',
-        darker: '#016630',
+        darker: '#0d542b',
         mid: '#7ccf00',
-        lighter: '#bbf451',
+        lighter: '#024a70',
     },
     yellow: {
         className: 'bg-yellow-500',
-        darker: '#894b00',
+        darker: '#733e0a',
         mid: '#f0b100',
-        lighter: '#894b00',
+        lighter: '#fef9c2',
     },
     pink: {
         className: 'bg-pink-500',
-        darker: '#a3004c',
+        darker: '#8b0836',
         mid: '#f6339a',
-        lighter: '#fda5d5',
+        lighter: '#733e0a',
     },
 };
 

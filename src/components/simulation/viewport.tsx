@@ -125,22 +125,51 @@ export function SimulationThreeCanvas() {
                 state.clearReset();
             }
 
+            const lighterDuration = 2;
+            const midDuration = 10;
+
             if (state.isRunning && indexRef.current < maxPoints) {
                 const i = indexRef.current;
                 const next = calculateNextPoint(currentPointRef.current, state.params);
 
+                // update position buffer
                 const pos = positionsRef.current;
                 pos[i * 3] = next.x;
                 pos[i * 3 + 1] = next.y;
                 pos[i * 3 + 2] = next.z;
 
-                const c = new THREE.Color(pathColors[state.color].mid);
+                // store the point in state for reference
+                state.pointsData[i] = next;
+                const total = i + 1;
                 const col = colorsRef.current;
-                col[i * 3] = c.r;
-                col[i * 3 + 1] = c.g;
-                col[i * 3 + 2] = c.b;
 
-                line.geometry.setDrawRange(0, i);
+                const darkerColor = new THREE.Color(pathColors[state.color].darker);
+                const midColor = new THREE.Color(pathColors[state.color].mid);
+                const lighterColor = new THREE.Color(pathColors[state.color].lighter);
+
+                for (let j = 0; j < total; j++) {
+                    const age = (i - j) * state.params.dt;
+                    let c: THREE.Color;
+
+                    // newest points → lighter
+                    // mid-aged points → mid
+                    // oldest points → darker
+                    if (age < lighterDuration) {
+                        const t = age / lighterDuration;
+                        c = lighterColor.clone().lerp(midColor, t);
+                    } else if (age < midDuration) {
+                        const t = (age - lighterDuration) / (midDuration - lighterDuration);
+                        c = midColor.clone().lerp(darkerColor, t);
+                    } else {
+                        c = darkerColor.clone();
+                    }
+
+                    col[j * 3] = c.r;
+                    col[j * 3 + 1] = c.g;
+                    col[j * 3 + 2] = c.b;
+                }
+
+                line.geometry.setDrawRange(0, total);
                 line.geometry.attributes.position.needsUpdate = true;
                 line.geometry.attributes.color.needsUpdate = true;
 
@@ -161,6 +190,7 @@ export function SimulationThreeCanvas() {
     }, []);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
         if (e.button !== 0) return;
         lastMouseRef.current = { x: e.clientX, y: e.clientY };
         if (e.shiftKey) isPanningRef.current = true;
@@ -168,6 +198,7 @@ export function SimulationThreeCanvas() {
     };
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
         const dx = e.clientX - lastMouseRef.current.x;
         const dy = e.clientY - lastMouseRef.current.y;
 
@@ -193,26 +224,28 @@ export function SimulationThreeCanvas() {
         lastMouseRef.current = { x: e.clientX, y: e.clientY };
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
         isDraggingRef.current = false;
         isPanningRef.current = false;
     };
 
-    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-        const { cameraDistance, setCameraDistance } = useLorenzStore.getState();
-        const delta = e.deltaY > 0 ? 5 : -5;
-        setCameraDistance(Math.max(50, Math.min(400, cameraDistance + delta)));
-    };
+    // const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    //     e.preventDefault();
+    //     const { cameraDistance, setCameraDistance } = useLorenzStore.getState();
+    //     const delta = e.deltaY > 0 ? 5 : -5;
+    //     setCameraDistance(Math.max(50, Math.min(400, cameraDistance + delta)));
+    // };
 
     return (
         <div
             ref={containerRef}
-            className="w-full h-full cursor-grab active:cursor-grabbing"
+            className="w-full h-full cursor-grab active:cursor-grabbing select-none touch-none"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            onWheel={handleWheel}
+            // onWheel={handleWheel}
         />
     );
 }
