@@ -1,4 +1,11 @@
-import { CameraAngles, CameraPan, LorenzParams, MaxPointsSelections, Point3D } from './types';
+import {
+    CameraAngles,
+    CameraPan,
+    LorenzParams,
+    MaxPointsSelections,
+    Point3D,
+    SpeedSelections,
+} from './types';
 
 export const pathColors = {
     orange: {
@@ -61,3 +68,6 @@ export const paramBounds = {
 
 export const maxPointsOptions: MaxPointsSelections[] = [2500, 5000, 10000, 20000, 30000];
 export const defaultMaxPoints = 10000;
+
+export const speedOptions: SpeedSelections[] = [0.5, 1, 2];
+export const defaultSpeed = 1;

@@ -105,6 +105,9 @@ export function MaxPoints() {
                             This value controls how many points are rendered in the simulation at
                             once. Increasing it may impact performance.
                         </p>
+                        <p className="text-xs opacity-50 text-orange-400">
+                            Updating the maximum rendered points will reset the animation.
+                        </p>
                     </HoverCardContent>
                 </HoverCard>
             </div>

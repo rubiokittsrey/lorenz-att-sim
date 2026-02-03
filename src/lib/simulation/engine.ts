@@ -21,21 +21,20 @@ export function updateSimulation(
     buffer: CircularBuffer,
     currentPointRef: React.MutableRefObject<Point3D>,
     line1: THREE.Line,
-    line2: THREE.Line
+    line2: THREE.Line,
+    stepsPerFrame: number = 1
 ): void {
     const state = useLorenzStore.getState();
 
-    const next = calculateNextPoint(currentPointRef.current, state.params);
-
-    buffer.addPoint(next);
-
-    state.setCurrentPoint(next);
-    state.addPoint(next);
+    for (let i = 0; i < stepsPerFrame; i++) {
+        const next = calculateNextPoint(currentPointRef.current, state.params);
+        buffer.addPoint(next);
+        state.setCurrentPoint(next);
+        state.addPoint(next);
+        currentPointRef.current = next;
+    }
 
     buffer.updateColors(state.params.dt, pathColors[state.color]);
-
     updateLineDrawRanges(line1, line2, buffer);
     markGeometryForUpdate(line1, line2);
-
-    currentPointRef.current = next;
 }

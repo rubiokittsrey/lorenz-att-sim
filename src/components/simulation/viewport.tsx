@@ -1,10 +1,10 @@
-import { defaultMaxPoints, pathColors } from '@/lib/simulation/constants';
+import { defaultMaxPoints } from '@/lib/simulation/constants';
 import { useLorenzStore } from '@/lib/simulation/store';
-import { LorenzParams, Point3D } from '@/lib/simulation/types';
+import { Point3D } from '@/lib/simulation/types';
 import { cn, createFpsCounter } from '@/lib/utils';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { calculateNextPoint, CircularBuffer } from '@/lib/simulation/lorenz-utils';
+import { CircularBuffer } from '@/lib/simulation/lorenz-utils';
 import { useCameraControls } from '@/lib/simulation/use-camera-controls';
 import { handleReset, updateSimulation } from '@/lib/simulation/engine';
 import {
@@ -146,7 +146,13 @@ export function SimulationThreeCanvas() {
             }
 
             if (state.isRunning && line1 && line2) {
-                updateSimulation(bufferRef.current, currentPointRef, line1, line2);
+                updateSimulation(
+                    bufferRef.current,
+                    currentPointRef,
+                    line1,
+                    line2,
+                    Math.round(state.speed)
+                );
             }
 
             if (renderer && scene && camera) {

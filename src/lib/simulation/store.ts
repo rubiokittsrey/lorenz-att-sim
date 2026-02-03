@@ -1,5 +1,12 @@
 import { create } from 'zustand';
-import { Point3D, LorenzParams, CameraAngles, CameraPan, MaxPointsSelections } from './types';
+import {
+    Point3D,
+    LorenzParams,
+    CameraAngles,
+    CameraPan,
+    MaxPointsSelections,
+    SpeedSelections,
+} from './types';
 import {
     initialCameraAngles,
     initialCameraDistance,
@@ -21,6 +28,8 @@ interface LorenzSimulationStates {
 
     //misc
     fps: number | undefined;
+    speed: SpeedSelections;
+    setSpeed: (speed: SpeedSelections) => void;
 }
 
 interface CameraStates {
@@ -139,7 +148,8 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
 
     needsReset: false,
     requestReset: () => set({ needsReset: true, isRunning: false }),
-    clearReset: () => set({ needsReset: false }),
+    clearReset: () =>
+        set({ needsReset: false, currentPoint: { x: 0, y: 0, z: 0 }, pointsData: [] }),
 
     currentPreset: 'classic',
     loadPreset: (preset) =>
@@ -157,4 +167,7 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
     toggleUI: () => set((state) => ({ hideUI: !state.hideUI })),
     toggleStats: () => set((state) => ({ hideStats: !state.hideStats })),
     setMaxPoints: (points) => set({ maxPoints: points }),
+
+    speed: 1,
+    setSpeed: (speed: SpeedSelections) => set({ speed }),
 }));

@@ -13,6 +13,7 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useLorenzStore } from '@/lib/simulation/store';
+import { speedOptions } from '@/lib/simulation/constants';
 
 export default function SimulationControls({
     className,
@@ -111,27 +112,21 @@ export function ResetSimView() {
 }
 
 export function SetSimSpeed() {
-    const speeds = {
-        'speed-x0.5': 0.5,
-        'speed-x1': 1.0,
-        'speed-x2': 2.0,
-    };
-    const [speed, setSpeed] = useState<keyof typeof speeds>('speed-x0.5');
+    const { speed, setSpeed } = useLorenzStore();
 
-    const speedKeys = Object.keys(speeds) as (keyof typeof speeds)[];
     const handleCycleSpeed = () => {
-        const currentIndex = speedKeys.indexOf(speed);
-        const nextIndex = (currentIndex + 1) % speedKeys.length;
-        setSpeed(speedKeys[nextIndex]);
+        const currentIndex = speedOptions.indexOf(speed);
+        const nextIndex = (currentIndex + 1) % speedOptions.length;
+        setSpeed(speedOptions[nextIndex]);
     };
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button disabled variant={'secondary'} className="" onClick={handleCycleSpeed}>
-                    {speed === 'speed-x0.5' ? (
+                <Button variant={'secondary'} className="" onClick={handleCycleSpeed}>
+                    {speed === 0.5 ? (
                         <SnailIcon />
-                    ) : speed === 'speed-x1' ? (
+                    ) : speed === 1 ? (
                         <RabbitIcon />
                     ) : (
                         <TrainFrontIcon />
@@ -139,7 +134,7 @@ export function SetSimSpeed() {
                 </Button>
             </TooltipTrigger>
             <TooltipContent>
-                <p className="font-sans">Change Speed {`(x${speeds[speed]})`}</p>
+                <p className="font-sans">Change Speed {`(x${speed})`}</p>
             </TooltipContent>
         </Tooltip>
     );

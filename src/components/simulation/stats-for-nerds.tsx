@@ -17,6 +17,7 @@ export default function StatsForNerds({
         >
             <PointsDataLength />
             <FPSDisplay />
+            <RenderSpeed />
             <XYZPoints />
         </div>
     );
@@ -52,6 +53,15 @@ export function FPSDisplay() {
     return (
         <div className="rounded w-fit bg-neutral-200 dark:bg-neutral-800 px-2 py-0.5 border">
             <h4 className="text-sm select-none">{`FPS: ${fps}`}</h4>
+        </div>
+    );
+}
+
+export function RenderSpeed() {
+    const { speed } = useLorenzStore();
+    return (
+        <div className="rounded w-fit bg-neutral-200 dark:bg-neutral-800 px-2 py-0.5 border">
+            <h4 className="text-sm select-none">{`Render Speed: ${speed} step(s) per frame`}</h4>
         </div>
     );
 }
