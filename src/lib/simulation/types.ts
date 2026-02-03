@@ -23,3 +23,5 @@ export interface CameraPan {
     y: number;
     z: number;
 }
+
+export type MaxPointsSelections = 2500 | 5000 | 10000 | 20000 | 30000;

@@ -1,12 +1,12 @@
 import { create } from 'zustand';
-import { Point3D, LorenzParams, CameraAngles, CameraPan } from './types';
+import { Point3D, LorenzParams, CameraAngles, CameraPan, MaxPointsSelections } from './types';
 import {
     initialCameraAngles,
     initialCameraDistance,
     initialCameraPan,
     initialColor,
     initialPoint,
-    maxPoints,
+    defaultMaxPoints,
     paramPresets,
     pathColors,
 } from './constants';
@@ -66,12 +66,23 @@ interface VisualizationActions {
     setColor: (color: keyof typeof pathColors) => void;
 }
 
+interface Preferences {
+    hideUI: boolean;
+    hideStats: boolean;
+    maxPoints: MaxPointsSelections;
+
+    toggleUI: () => void;
+    toggleStats: () => void;
+    setMaxPoints: (points: MaxPointsSelections) => void;
+}
+
 export type LorenzStore = LorenzSimulationStates &
     LorenzSimulationActions &
     CameraStates &
     CameraActions &
     VisualizationStates &
-    VisualizationActions;
+    VisualizationActions &
+    Preferences;
 
 export const useLorenzStore = create<LorenzStore>((set) => ({
     params: paramPresets.classic,
@@ -103,7 +114,7 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
     addPoint: (point) =>
         set((state) => {
             const newPoints = [...state.pointsData, point];
-            if (newPoints.length > maxPoints) {
+            if (newPoints.length > state.maxPoints) {
                 newPoints.shift();
             }
             return { pointsData: newPoints };
@@ -139,4 +150,11 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
             currentPreset: preset,
         }),
     clearPreset: () => set({ currentPreset: '' }),
+
+    hideUI: false,
+    hideStats: true,
+    maxPoints: defaultMaxPoints,
+    toggleUI: () => set((state) => ({ hideUI: !state.hideUI })),
+    toggleStats: () => set((state) => ({ hideStats: !state.hideStats })),
+    setMaxPoints: (points) => set({ maxPoints: points }),
 }));

@@ -2,7 +2,7 @@ import { CircleQuestionMarkIcon, CopyrightIcon } from 'lucide-react';
 
 export default function About() {
     return (
-        <div className="flex flex-col space-y-8 p-8 pb-10">
+        <div className="flex flex-col space-y-8 p-8">
             <div className="flex justify-between">
                 <h3 className="text-lg flex items-center">
                     <CircleQuestionMarkIcon className="mr-2 size-5" /> About
