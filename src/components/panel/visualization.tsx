@@ -2,6 +2,7 @@ import { CheckIcon, EllipsisIcon, MinusIcon, PaletteIcon, PipetteIcon } from 'lu
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import { pathColors } from '@/lib/simulation/constants';
 
 export default function Visualization() {
     const [displayMode, setDisplayMode] = useState<'line' | 'dots'>('line');
@@ -21,38 +22,18 @@ export default function Visualization() {
 
 export function PathColor() {
     const [color, setColor] = useState('orange');
-    const colors = {
-        orange: {
-            className: 'bg-orange-500',
-        },
-        red: {
-            className: 'bg-red-500',
-        },
-        blue: {
-            className: 'bg-blue-500',
-        },
-        green: {
-            className: 'bg-green-500',
-        },
-        yellow: {
-            className: 'bg-yellow-500',
-        },
-        pink: {
-            className: 'bg-pink-500',
-        },
-    };
-    const colorsKeys = Object.keys(colors) as (keyof typeof colors)[];
+    const pathColorsKeys = Object.keys(pathColors) as (keyof typeof pathColors)[];
 
     return (
         <div className="flex flex-col space-y-3">
             <h4>Path Color</h4>
             <div className="flex space-x-2">
-                {colorsKeys.map((c) => (
+                {pathColorsKeys.map((c) => (
                     <button
                         key={c}
                         className={cn(
                             'size-8 rounded cursor-pointer flex items-center justify-center',
-                            colors[c].className
+                            pathColors[c].className
                         )}
                         onClick={() => {
                             setColor(c);
