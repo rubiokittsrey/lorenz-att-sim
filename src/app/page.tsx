@@ -5,15 +5,18 @@ import Parameters from '@/components/panel/parameters';
 import Visualization from '@/components/panel/visualization';
 import SimulationControls from '@/components/simulation/controls';
 import GizmoToggles from '@/components/simulation/gizmo-toggles';
+import StatsForNerds from '@/components/simulation/stats-for-nerds';
 import SimulationViewPort, { SimulationThreeCanvas } from '@/components/simulation/viewport';
 import SiteTitle from '@/components/site-title';
 import ThemeToggle from '@/components/theme-toggle';
+import { useLorenzStore } from '@/lib/simulation/store';
 
 export default function LorenzAttractor3d() {
     return (
         <div className="grid grid-cols-12 h-full overflow-hidden">
             <SimulationViewPort>
                 <SiteTitle />
+                <StatsForNerds />
                 <GizmoToggles className="absolute top-8 right-8" />
                 <SimulationControls className="absolute bottom-8 right-8" />
                 <SimulationThreeCanvas />

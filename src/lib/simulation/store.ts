@@ -6,6 +6,7 @@ import {
     initialCameraPan,
     initialColor,
     initialPoint,
+    maxPoints,
     paramPresets,
     pathColors,
 } from './constants';
@@ -17,6 +18,9 @@ interface LorenzSimulationStates {
     currentPoint: Point3D;
     pointsData: Point3D[];
     needsReset: boolean;
+
+    //misc
+    fps: number | undefined;
 }
 
 interface CameraStates {
@@ -85,6 +89,8 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
     showAxes: false,
     color: initialColor,
 
+    fps: undefined,
+
     updateParams: (params) =>
         set((state) => ({
             params: { ...state.params, ...params },
@@ -97,7 +103,7 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
     addPoint: (point) =>
         set((state) => {
             const newPoints = [...state.pointsData, point];
-            if (newPoints.length > 5000) {
+            if (newPoints.length > maxPoints) {
                 newPoints.shift();
             }
             return { pointsData: newPoints };

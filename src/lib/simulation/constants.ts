@@ -59,4 +59,4 @@ export const paramBounds = {
     dt: { max: 0.05, min: 0.001, step: 0.001 },
 };
 
-export const maxPoints = 60000;
+export const maxPoints = 10000;

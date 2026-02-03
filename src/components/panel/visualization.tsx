@@ -74,6 +74,7 @@ export function DisplayMode() {
                     onClick={() => setVisualMode('dots')}
                     variant={visualMode === 'dots' ? 'default' : 'outline'}
                     className="border"
+                    disabled
                 >
                     Dots <EllipsisIcon />
                 </Button>

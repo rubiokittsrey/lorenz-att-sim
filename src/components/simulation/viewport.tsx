@@ -1,7 +1,7 @@
 import { maxPoints, pathColors } from '@/lib/simulation/constants';
 import { useLorenzStore } from '@/lib/simulation/store';
 import { LorenzParams, Point3D } from '@/lib/simulation/types';
-import { cn } from '@/lib/utils';
+import { cn, createFpsCounter } from '@/lib/utils';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
@@ -30,8 +30,10 @@ export function SimulationThreeCanvas() {
     const cameraRef = useRef<THREE.PerspectiveCamera>(null);
     const rendererRef = useRef<THREE.WebGLRenderer>(null);
     const lineRef = useRef<THREE.Line>(null);
+    const line2Ref = useRef<THREE.Line>(null);
 
     const indexRef = useRef(0);
+    const headRef = useRef(0);
     const currentPointRef = useRef<Point3D>({ x: 0.1, y: 0, z: 0 });
 
     const positionsRef = useRef(new Float32Array(maxPoints * 3));
@@ -40,6 +42,8 @@ export function SimulationThreeCanvas() {
     const isDraggingRef = useRef(false);
     const isPanningRef = useRef(false);
     const lastMouseRef = useRef({ x: 0, y: 0 });
+
+    const getFps = createFpsCounter();
 
     const calculateNextPoint = (p: Point3D, params: LorenzParams): Point3D => {
         const { sigma, rho, beta, dt } = params;
@@ -68,6 +72,7 @@ export function SimulationThreeCanvas() {
 
     useEffect(() => {
         if (!containerRef.current) return;
+        let rafId: number;
 
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0a14);
@@ -91,14 +96,22 @@ export function SimulationThreeCanvas() {
         const axes = new THREE.AxesHelper(80);
         scene.add(grid, axes);
 
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positionsRef.current, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colorsRef.current, 3));
+        // Create two line segments to handle circular buffer wrap-around
+        const geometry1 = new THREE.BufferGeometry();
+        geometry1.setAttribute('position', new THREE.BufferAttribute(positionsRef.current, 3));
+        geometry1.setAttribute('color', new THREE.BufferAttribute(colorsRef.current, 3));
+
+        const geometry2 = new THREE.BufferGeometry();
+        geometry2.setAttribute('position', new THREE.BufferAttribute(positionsRef.current, 3));
+        geometry2.setAttribute('color', new THREE.BufferAttribute(colorsRef.current, 3));
 
         const material = new THREE.LineBasicMaterial({ vertexColors: true });
-        const line = new THREE.Line(geometry, material);
-        scene.add(line);
-        lineRef.current = line;
+        const line1 = new THREE.Line(geometry1, material);
+        const line2 = new THREE.Line(geometry2, material.clone());
+
+        scene.add(line1, line2);
+        lineRef.current = line1;
+        line2Ref.current = line2;
 
         const onResize = () => {
             camera.aspect = containerRef.current!.clientWidth / containerRef.current!.clientHeight;
@@ -107,20 +120,26 @@ export function SimulationThreeCanvas() {
         };
         window.addEventListener('resize', onResize);
 
-        const animate = () => {
-            requestAnimationFrame(animate);
+        const listener = (e: WheelEvent) => e.preventDefault();
+        containerRef.current.addEventListener('wheel', listener, { passive: false });
+
+        const animate = (now: number) => {
+            rafId = requestAnimationFrame(animate);
 
             const state = useLorenzStore.getState();
             grid.visible = state.showGrids;
             axes.visible = state.showAxes;
+            state.fps = getFps(now);
 
             updateCamera();
 
             if (state.needsReset) {
                 indexRef.current = 0;
+                headRef.current = 0;
                 currentPointRef.current = { x: 0.1, y: 0, z: 0 };
 
-                line.geometry.setDrawRange(0, 0);
+                lineRef.current!.geometry.setDrawRange(0, 0);
+                line2Ref.current!.geometry.setDrawRange(0, 0);
 
                 state.clearReset();
             }
@@ -128,32 +147,41 @@ export function SimulationThreeCanvas() {
             const lighterDuration = 2;
             const midDuration = 10;
 
-            if (state.isRunning && indexRef.current < maxPoints) {
-                const i = indexRef.current;
+            if (state.isRunning) {
                 const next = calculateNextPoint(currentPointRef.current, state.params);
-
-                // update position buffer
                 const pos = positionsRef.current;
-                pos[i * 3] = next.x;
-                pos[i * 3 + 1] = next.y;
-                pos[i * 3 + 2] = next.z;
-
-                // store the point in state for reference
-                state.pointsData[i] = next;
-                const total = i + 1;
                 const col = colorsRef.current;
 
+                // write to circular buffer head position
+                const idx = headRef.current;
+                pos[idx * 3] = next.x;
+                pos[idx * 3 + 1] = next.y;
+                pos[idx * 3 + 2] = next.z;
+
+                // store the point in state for reference
+                state.setCurrentPoint(next);
+                state.addPoint(next);
+
+                // move head forward circularly
+                headRef.current = (headRef.current + 1) % maxPoints;
+                indexRef.current++;
+
+                // calculate how many points we actually have
+                const total = Math.min(indexRef.current, maxPoints);
+
+                // update colors for all points
                 const darkerColor = new THREE.Color(pathColors[state.color].darker);
                 const midColor = new THREE.Color(pathColors[state.color].mid);
                 const lighterColor = new THREE.Color(pathColors[state.color].lighter);
 
+                // color calculation needs to account for circular buffer
+                // head is the newest point, (head - 1 + maxPoints) % maxPoints is second newest, etc.
                 for (let j = 0; j < total; j++) {
-                    const age = (i - j) * state.params.dt;
+                    // calculate buffer index going backwards from head
+                    const bufferIdx = (headRef.current - 1 - j + maxPoints) % maxPoints;
+                    const age = j * state.params.dt;
                     let c: THREE.Color;
 
-                    // newest points → lighter
-                    // mid-aged points → mid
-                    // oldest points → darker
                     if (age < lighterDuration) {
                         const t = age / lighterDuration;
                         c = lighterColor.clone().lerp(midColor, t);
@@ -164,28 +192,53 @@ export function SimulationThreeCanvas() {
                         c = darkerColor.clone();
                     }
 
-                    col[j * 3] = c.r;
-                    col[j * 3 + 1] = c.g;
-                    col[j * 3 + 2] = c.b;
+                    col[bufferIdx * 3] = c.r;
+                    col[bufferIdx * 3 + 1] = c.g;
+                    col[bufferIdx * 3 + 2] = c.b;
                 }
 
-                line.geometry.setDrawRange(0, total);
-                line.geometry.attributes.position.needsUpdate = true;
-                line.geometry.attributes.color.needsUpdate = true;
+                // for rendering, split the line at the wrap point
+                const line1 = lineRef.current!;
+                const line2 = line2Ref.current!;
 
+                if (total < maxPoints) {
+                    // buffer not full yet - draw from 0 to head
+                    line1.geometry.setDrawRange(0, total);
+                    line2.geometry.setDrawRange(0, 0); // Hide second line
+                } else {
+                    // buffer is full and wrapping
+                    // draw two segments: [head, maxPoints) and [0, head)
+                    const headPos = headRef.current;
+
+                    if (headPos === 0) {
+                        // special case: head at start, draw entire buffer
+                        line1.geometry.setDrawRange(0, maxPoints);
+                        line2.geometry.setDrawRange(0, 0);
+                    } else {
+                        // split: newest section from head to end, oldest section from 0 to head
+                        line1.geometry.setDrawRange(headPos, maxPoints - headPos);
+                        line2.geometry.setDrawRange(0, headPos);
+                    }
+                }
+
+                line1.geometry.attributes.position.needsUpdate = true;
+                line1.geometry.attributes.color.needsUpdate = true;
+                line2.geometry.attributes.position.needsUpdate = true;
+                line2.geometry.attributes.color.needsUpdate = true;
                 currentPointRef.current = next;
-                indexRef.current++;
             }
 
             renderer.render(scene, camera);
         };
 
-        animate();
+        rafId = requestAnimationFrame(animate);
 
         return () => {
             window.removeEventListener('resize', onResize);
             renderer.dispose();
             containerRef.current?.removeChild(renderer.domElement);
+            containerRef.current?.removeEventListener('wheel', listener);
+            cancelAnimationFrame(rafId);
         };
     }, []);
 
@@ -230,12 +283,12 @@ export function SimulationThreeCanvas() {
         isPanningRef.current = false;
     };
 
-    // const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    //     e.preventDefault();
-    //     const { cameraDistance, setCameraDistance } = useLorenzStore.getState();
-    //     const delta = e.deltaY > 0 ? 5 : -5;
-    //     setCameraDistance(Math.max(50, Math.min(400, cameraDistance + delta)));
-    // };
+    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const { cameraDistance, setCameraDistance } = useLorenzStore.getState();
+        const delta = e.deltaY > 0 ? 5 : -5;
+        setCameraDistance(Math.max(50, Math.min(400, cameraDistance + delta)));
+    };
 
     return (
         <div
@@ -245,7 +298,7 @@ export function SimulationThreeCanvas() {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            // onWheel={handleWheel}
+            onWheel={handleWheel}
         />
     );
 }
