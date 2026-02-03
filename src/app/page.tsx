@@ -1,5 +1,6 @@
 'use client';
 
+import About from '@/components/panel/about';
 import Parameters from '@/components/panel/parameters';
 import Visualization from '@/components/panel/visualization';
 import SimulationControls from '@/components/simulation/controls';
@@ -33,6 +34,8 @@ function Panel() {
             <Parameters />
             <hr className="border-t border-gray-400/50 dark:border-neutral-600/50 mt-3 mb-1" />
             <Visualization />
+            <hr className="border-t border-gray-400/50 dark:border-neutral-600/50 mt-3 mb-1" />
+            <About />
         </div>
     );
 }
