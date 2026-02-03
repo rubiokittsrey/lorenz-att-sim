@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Slider } from '../ui/slider';
 import { Settings2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
+import { useLorenzStore } from '@/lib/simulation/store';
+import { paramBounds, paramPresets } from '@/lib/simulation/constants';
 
 export default function Parameters() {
-    const presets = ['classic', 'complex', 'stable'];
-    const [preset, setPreset] = useState<string>('classic');
+    const { currentPreset, loadPreset } = useLorenzStore();
+    const presets = Object.keys(paramPresets) as (keyof typeof paramPresets)[];
 
     return (
         <div className="flex flex-col space-y-8 p-8">
@@ -15,10 +17,9 @@ export default function Parameters() {
                 </h3>
                 <Tabs
                     defaultValue="classic"
+                    value={currentPreset}
                     className="h-8"
-                    onValueChange={(val) => {
-                        setPreset(val);
-                    }}
+                    onValueChange={(val) => loadPreset(val as keyof typeof paramPresets)}
                 >
                     <TabsList className="bg-input/50 p-0 rounded border">
                         {presets.map((p) => (
@@ -42,7 +43,7 @@ export default function Parameters() {
 }
 
 export function SigmaSlider() {
-    const [val, setVal] = useState(10.0);
+    const { params, updateParams } = useLorenzStore();
 
     return (
         <div className="flex flex-col">
@@ -50,23 +51,24 @@ export function SigmaSlider() {
                 <h4>
                     Sigma (<span className="">σ</span>)
                 </h4>
-                <h4>{val.toFixed(2)}</h4>
+                <h4>{params.sigma.toFixed(2)}</h4>
             </div>
             <Slider
                 className="[&>span>span>span]:h-1 [&>span>span>span]:w-1 h-1"
                 onValueChange={(n) => {
-                    setVal(n[0]);
+                    updateParams({ sigma: n[0] });
                 }}
-                defaultValue={[10]}
-                max={20}
-                step={0.1}
+                defaultValue={[paramPresets.classic.sigma]}
+                value={[params.sigma]}
+                max={paramBounds.sigma.max}
+                step={paramBounds.sigma.step}
             />
         </div>
     );
 }
 
 export function RhoSlider() {
-    const [val, setVal] = useState(28.0);
+    const { params, updateParams } = useLorenzStore();
 
     return (
         <div className="flex flex-col">
@@ -74,61 +76,64 @@ export function RhoSlider() {
                 <h4>
                     Rho (<span className="">ρ</span>)
                 </h4>
-                <h4>{val.toFixed(2)}</h4>
+                <h4>{params.rho.toFixed(2)}</h4>
             </div>
             <Slider
                 className=""
                 onValueChange={(n) => {
-                    setVal(n[0]);
+                    updateParams({ rho: n[0] });
                 }}
-                defaultValue={[28.0]}
-                max={50}
-                step={0.1}
+                defaultValue={[paramPresets.classic.rho]}
+                value={[params.rho]}
+                max={paramBounds.rho.max}
+                step={paramBounds.rho.step}
             />
         </div>
     );
 }
 
 export function BetaSlider() {
-    const [val, setVal] = useState(2.67);
+    const { params, updateParams } = useLorenzStore();
 
     return (
         <div className="flex flex-col">
             <div className="flex flex-row justify-between items-center space-y-3">
                 <h4>Beta (β)</h4>
-                <h4>{val.toFixed(2)}</h4>
+                <h4>{params.beta.toFixed(2)}</h4>
             </div>
             <Slider
                 className=""
                 onValueChange={(n) => {
-                    setVal(n[0]);
+                    updateParams({ beta: n[0] });
                 }}
-                defaultValue={[2.67]}
-                max={5}
-                step={0.01}
+                defaultValue={[paramPresets.classic.beta]}
+                value={[params.beta]}
+                max={paramBounds.beta.max}
+                step={paramBounds.beta.step}
             />
         </div>
     );
 }
 
 export function DeltaTimeSlider() {
-    const [val, setVal] = useState(0.01);
+    const { params, updateParams } = useLorenzStore();
 
     return (
         <div className="flex flex-col">
             <div className="flex flex-row justify-between items-center space-y-3">
                 <h4>Time Step (dt)</h4>
-                <h4>{val.toFixed(3)}</h4>
+                <h4>{params.dt.toFixed(3)}</h4>
             </div>
             <Slider
                 className=""
                 onValueChange={(n) => {
-                    setVal(n[0]);
+                    updateParams({ dt: n[0] });
                 }}
-                defaultValue={[0.01]}
-                max={0.05}
-                min={0.001}
-                step={0.001}
+                defaultValue={[paramPresets.classic.dt]}
+                value={[params.dt]}
+                max={paramBounds.dt.max}
+                min={paramBounds.dt.min}
+                step={paramBounds.dt.step}
             />
         </div>
     );

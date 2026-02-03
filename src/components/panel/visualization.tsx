@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { pathColors } from '@/lib/simulation/constants';
+import { useLorenzStore } from '@/lib/simulation/store';
 
 export default function Visualization() {
     const [displayMode, setDisplayMode] = useState<'line' | 'dots'>('line');
@@ -21,7 +22,7 @@ export default function Visualization() {
 }
 
 export function PathColor() {
-    const [color, setColor] = useState('orange');
+    const { color, setColor } = useLorenzStore();
     const pathColorsKeys = Object.keys(pathColors) as (keyof typeof pathColors)[];
 
     return (
@@ -56,22 +57,22 @@ export function PathColor() {
 }
 
 export function DisplayMode() {
-    const [mode, setMode] = useState<'line' | 'dots'>('line');
+    const { visualMode, setVisualMode } = useLorenzStore();
 
     return (
         <div className="flex flex-col space-y-3">
             <h4>Display Mode</h4>
             <div className="flex space-x-3">
                 <Button
-                    onClick={() => setMode('line')}
-                    variant={mode === 'line' ? 'default' : 'outline'}
+                    onClick={() => setVisualMode('line')}
+                    variant={visualMode === 'line' ? 'default' : 'outline'}
                     className="border"
                 >
                     Line <MinusIcon />
                 </Button>
                 <Button
-                    onClick={() => setMode('dots')}
-                    variant={mode === 'dots' ? 'default' : 'outline'}
+                    onClick={() => setVisualMode('dots')}
+                    variant={visualMode === 'dots' ? 'default' : 'outline'}
                     className="border"
                 >
                     Dots <EllipsisIcon />

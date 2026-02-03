@@ -12,6 +12,7 @@ import { Button } from '../ui/button';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useLorenzStore } from '@/lib/simulation/store';
 
 export default function SimulationControls({
     className,
@@ -33,19 +34,17 @@ export default function SimulationControls({
 }
 
 export function PauseSim() {
-    const [isPaused, setPaused] = useState(false);
+    const { isRunning, toggleIsRunning } = useLorenzStore();
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    variant={isPaused ? 'default' : 'secondary'}
+                    variant={isRunning ? 'secondary' : 'default'}
                     className=""
-                    onClick={() => {
-                        setPaused((prev) => !prev);
-                    }}
+                    onClick={toggleIsRunning}
                 >
-                    {isPaused ? <PlayIcon /> : <PauseIcon className="" />}
+                    {isRunning ? <PauseIcon /> : <PlayIcon className="" />}
                 </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -56,10 +55,19 @@ export function PauseSim() {
 }
 
 export function ResetSim() {
+    const { requestReset, clearPoints } = useLorenzStore();
+
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button variant={'destructive'} className="">
+                <Button
+                    onClick={() => {
+                        requestReset();
+                        clearPoints();
+                    }}
+                    variant={'destructive'}
+                    className=""
+                >
                     <RotateCcwIcon />
                 </Button>
             </TooltipTrigger>
@@ -74,7 +82,7 @@ export function SaveImage() {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button variant={'secondary'} className="">
+                <Button disabled variant={'secondary'} className="">
                     <SaveIcon />
                 </Button>
             </TooltipTrigger>
@@ -86,10 +94,12 @@ export function SaveImage() {
 }
 
 export function ResetSimView() {
+    const { resetCamera } = useLorenzStore();
+
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button variant={'secondary'} className="">
+                <Button onClick={resetCamera} variant={'secondary'} className="">
                     <Rotate3DIcon />
                 </Button>
             </TooltipTrigger>
@@ -118,7 +128,7 @@ export function SetSimSpeed() {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button variant={'secondary'} className="" onClick={handleCycleSpeed}>
+                <Button disabled variant={'secondary'} className="" onClick={handleCycleSpeed}>
                     {speed === 'speed-x0.5' ? (
                         <SnailIcon />
                     ) : speed === 'speed-x1' ? (

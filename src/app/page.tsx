@@ -5,7 +5,7 @@ import Parameters from '@/components/panel/parameters';
 import Visualization from '@/components/panel/visualization';
 import SimulationControls from '@/components/simulation/controls';
 import GizmoToggles from '@/components/simulation/gizmo-toggles';
-import SimulationViewPort from '@/components/simulation/viewport';
+import SimulationViewPort, { SimulationThreeCanvas } from '@/components/simulation/viewport';
 import SiteTitle from '@/components/site-title';
 import ThemeToggle from '@/components/theme-toggle';
 
@@ -16,7 +16,7 @@ export default function LorenzAttractor3d() {
                 <SiteTitle />
                 <GizmoToggles className="absolute top-8 right-8" />
                 <SimulationControls className="absolute bottom-8 right-8" />
-                <ThemeToggle />
+                <SimulationThreeCanvas />
             </SimulationViewPort>
             <Panel />
         </div>

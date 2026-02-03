@@ -12,9 +12,11 @@ import {
 
 interface LorenzSimulationStates {
     params: LorenzParams;
+    currentPreset: keyof typeof paramPresets | '';
     isRunning: boolean;
     currentPoint: Point3D;
     pointsData: Point3D[];
+    needsReset: boolean;
 }
 
 interface CameraStates {
@@ -32,14 +34,16 @@ interface VisualizationStates {
 }
 
 interface LorenzSimulationActions {
-    setParams: (params: LorenzParams) => void;
     updateParams: (params: Partial<LorenzParams>) => void;
+    clearPreset: () => void;
+
     toggleIsRunning: () => void;
     setCurrentPoint: (point: Point3D) => void;
     addPoint: (point: Point3D) => void;
     clearPoints: () => void;
 
-    reset: () => void;
+    requestReset: () => void;
+    clearReset: () => void;
     loadPreset: (preset: 'classic' | 'complex' | 'stable') => void;
 }
 
@@ -53,9 +57,7 @@ interface CameraActions {
 interface VisualizationActions {
     setVisualMode: (mode: 'line' | 'dots') => void;
     setDotSize: (size: number) => void;
-    setShowGrid: (show: boolean) => void;
-    toggleGrid: () => void;
-    setShowAxes: (show: boolean) => void;
+    toggleGrids: () => void;
     toggleAxes: () => void;
     setColor: (color: keyof typeof pathColors) => void;
 }
@@ -83,10 +85,10 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
     showAxes: false,
     color: initialColor,
 
-    setParams: (params) => set({ params }),
     updateParams: (params) =>
         set((state) => ({
             params: { ...state.params, ...params },
+            currentPreset: '',
         })),
 
     toggleIsRunning: () => set((state) => ({ isRunning: !state.isRunning })),
@@ -108,28 +110,27 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
     resetCamera: () =>
         set({
             cameraAngles: initialCameraAngles,
-            cameraDistance: 150,
+            cameraDistance: initialCameraDistance,
             cameraPan: initialCameraPan,
         }),
 
     setVisualMode: (mode) => set({ visualMode: mode }),
     setDotSize: (size) => set({ dotSize: size }),
-    setShowGrid: (show) => set({ showGrids: show }),
-    toggleGrid: () => set((state) => ({ showGrids: !state.showGrids })),
-    setShowAxes: (show) => set({ showAxes: show }),
+    toggleGrids: () => set((state) => ({ showGrids: !state.showGrids })),
     toggleAxes: () => set((state) => ({ showAxes: !state.showAxes })),
     setColor: (color) => set({ color }),
 
-    reset: () =>
-        set({
-            currentPoint: { x: 0.1, y: 0, z: 0 },
-            pointsData: [],
-        }),
+    needsReset: false,
+    requestReset: () => set({ needsReset: true, isRunning: false }),
+    clearReset: () => set({ needsReset: false }),
 
+    currentPreset: 'classic',
     loadPreset: (preset) =>
         set({
             params: paramPresets[preset],
             currentPoint: { x: 0.1, y: 0, z: 0 },
             pointsData: [],
+            currentPreset: preset,
         }),
+    clearPreset: () => set({ currentPreset: '' }),
 }));

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip';
 import { Button } from '../ui/button';
 import { GridIcon, Move3DIcon } from 'lucide-react';
+import { useLorenzStore } from '@/lib/simulation/store';
 
 export default function GizmoToggles({
     className,
@@ -17,17 +18,15 @@ export default function GizmoToggles({
 }
 
 export function AxesToggle() {
-    const [isHidden, setHidden] = useState(true);
+    const { showAxes, toggleAxes } = useLorenzStore();
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    variant={isHidden ? 'secondary' : 'default'}
-                    className={cn('', isHidden && 'opacity-50 hover:opacity-100')}
-                    onClick={() => {
-                        setHidden((prev) => !prev);
-                    }}
+                    variant={showAxes ? 'default' : 'secondary'}
+                    className={cn('', !showAxes && 'opacity-50 hover:opacity-100')}
+                    onClick={toggleAxes}
                 >
                     <Move3DIcon />
                 </Button>
@@ -40,17 +39,15 @@ export function AxesToggle() {
 }
 
 export function GridToggle() {
-    const [isHidden, setHidden] = useState(true);
+    const { showGrids, toggleGrids } = useLorenzStore();
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    variant={isHidden ? 'secondary' : 'default'}
-                    className={cn('', isHidden && 'opacity-50 hover:opacity-100')}
-                    onClick={() => {
-                        setHidden((prev) => !prev);
-                    }}
+                    variant={showGrids ? 'default' : 'secondary'}
+                    className={cn('', !showGrids && 'opacity-50 hover:opacity-100')}
+                    onClick={toggleGrids}
                 >
                     <GridIcon />
                 </Button>
