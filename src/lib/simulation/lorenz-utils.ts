@@ -16,18 +16,19 @@ export function calculatePointColor(
     age: number,
     colorScheme: { lighter: string; mid: string; darker: string }
 ): THREE.Color {
-    const lighterDuration = 2;
-    const midDuration = 10;
+    // aging duration (in seconds)
+    const initialDecay = 2;
+    const finalDecay = 10;
 
     const darkerColor = new THREE.Color(colorScheme.darker);
     const midColor = new THREE.Color(colorScheme.mid);
     const lighterColor = new THREE.Color(colorScheme.lighter);
 
-    if (age < lighterDuration) {
-        const t = age / lighterDuration;
+    if (age < initialDecay) {
+        const t = age / initialDecay;
         return lighterColor.clone().lerp(midColor, t);
-    } else if (age < midDuration) {
-        const t = (age - lighterDuration) / (midDuration - lighterDuration);
+    } else if (age < finalDecay) {
+        const t = (age - initialDecay) / (finalDecay - initialDecay);
         return midColor.clone().lerp(darkerColor, t);
     } else {
         return darkerColor.clone();

@@ -13,7 +13,7 @@ export default function About() {
             </div>
 
             <Tabs defaultValue="project" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 w-full bg-input/50 p-0 rounded border h-8">
+                <TabsList className="grid w-full grid-cols-3 bg-input/50 p-0 rounded border h-8">
                     {tabs.map((t) => (
                         <TabsTrigger
                             key={t}
