@@ -48,7 +48,7 @@ export function useCameraControls() {
     };
 
     const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-        e.preventDefault();
+        // e.preventDefault();
         const { cameraDistance, setCameraDistance } = useLorenzStore.getState();
         const delta = e.deltaY > 0 ? 5 : -5;
         setCameraDistance(Math.max(50, Math.min(400, cameraDistance + delta)));

@@ -155,8 +155,6 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
     loadPreset: (preset) =>
         set({
             params: paramPresets[preset],
-            currentPoint: { x: 0.1, y: 0, z: 0 },
-            pointsData: [],
             currentPreset: preset,
         }),
     clearPreset: () => set({ currentPreset: '' }),
