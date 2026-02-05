@@ -116,7 +116,7 @@ export function MaxPoints() {
                 onValueChange={(v) => setMaxPoints(Number(v) as MaxPointsSelections)}
                 className="w-full "
             >
-                <TabsList className="grid grid-cols-5 w-full bg-input/50 p-0 rounded border h-8">
+                <TabsList className="grid grid-cols-7 w-full bg-input/50 p-0 rounded border h-8">
                     {maxPointsOptions.map((points) => (
                         <TabsTrigger
                             key={points}

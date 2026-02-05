@@ -13,25 +13,22 @@ import { Button } from '@/components/ui/button';
 import { useLorenzStore } from '@/lib/simulation/store';
 import { cn } from '@/lib/utils';
 import { AsteriskIcon, CopyrightIcon } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 export default function LorenzAttractor3d() {
-    const { hideUI } = useLorenzStore();
+    const { hidePanel } = useLorenzStore();
 
     return (
-        <div className="grid grid-cols-12 h-full overflow-hidden ">
-            <SimulationViewPort className="col-span-8">
+        <MouseMovementListener className="grid grid-cols-12 h-full overfow-hidden">
+            <SimulationViewPort className={hidePanel ? 'col-span-12' : 'col-span-8'}>
                 <SimulationThreeCanvas />
-                {!hideUI && (
-                    <>
-                        <SiteTitle className="absolute top-8 left-8" />
-                        <GizmoToggles className="absolute top-8 right-8" />
-                        <SimulationControls className="absolute bottom-8 right-8" />
-                        <StatsForNerds className="absolute bottom-8 left-8" />
-                    </>
-                )}
+                <SiteTitle className="absolute top-8 left-8" />
+                <GizmoToggles className="absolute top-8 right-8" />
+                <SimulationControls className="absolute bottom-8 right-8" />
+                <StatsForNerds className="absolute bottom-8 left-8" />
             </SimulationViewPort>
-            <Panel className="col-span-4" />
-        </div>
+            {!hidePanel && <Panel className="col-span-4" />}
+        </MouseMovementListener>
     );
 }
 
@@ -60,6 +57,43 @@ function CopyRightSection() {
             <Button variant={'link'} className="flex items-center opacity-30 p-2 px-8 mb-2">
                 rubiokittsrey.dev
             </Button>
+        </div>
+    );
+}
+
+function MouseMovementListener({
+    children,
+    className,
+    ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+    const setMouseMoved = useLorenzStore((s) => s.setMouseMoved);
+
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleMouseMove = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        } else {
+            setMouseMoved(true);
+        }
+
+        timeoutRef.current = setTimeout(() => {
+            setMouseMoved(false);
+            timeoutRef.current = null;
+        }, 2500);
+    };
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
+    return (
+        <div {...props} className={className} onMouseMove={handleMouseMove}>
+            {children}
         </div>
     );
 }

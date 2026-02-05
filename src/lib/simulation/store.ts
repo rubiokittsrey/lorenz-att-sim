@@ -84,12 +84,18 @@ interface VisualizationActions {
 
 interface Preferences {
     hideUI: boolean;
+    hidePanel: boolean;
     hideStats: boolean;
     maxPoints: MaxPointsSelections;
 
     toggleUI: () => void;
     toggleStats: () => void;
     setMaxPoints: (points: MaxPointsSelections) => void;
+    togglePanel: () => void;
+
+    //misc
+    mouseMoved: boolean;
+    setMouseMoved: (t: boolean) => void;
 }
 
 export type LorenzStore = LorenzSimulationStates &
@@ -183,4 +189,10 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
 
     speed: 1,
     setSpeed: (speed: SpeedSelections) => set({ speed }),
+
+    hidePanel: false,
+    togglePanel: () => set((state) => ({ hidePanel: !state.hidePanel })),
+
+    mouseMoved: false,
+    setMouseMoved: (t) => set({ mouseMoved: t }),
 }));

@@ -24,7 +24,10 @@ export default function SimulationViewPort({
     return (
         <div
             {...props}
-            className={cn('h-full dark:bg-zinc-950 bg-neutral-600 relative', className)}
+            className={cn(
+                'h-full dark:bg-zinc-950 bg-neutral-600 relative overflow-hidden',
+                className
+            )}
         >
             {children}
         </div>
@@ -48,6 +51,8 @@ export function SimulationThreeCanvas() {
 
     // maxPoint sub
     const maxPoints = useLorenzStore((state) => state.maxPoints);
+
+    const mouseMoved = useLorenzStore((state) => state.mouseMoved);
 
     const { handleMouseDown, handleMouseMove, handleMouseUp, handleWheel } = useCameraControls();
     const getFps = createFpsCounter();
@@ -113,13 +118,21 @@ export function SimulationThreeCanvas() {
         lineRef.current = line1;
         line2Ref.current = line2;
 
-        const onResize = () => {
-            if (!container || !camera || !renderer) return;
-            camera.aspect = container.clientWidth / container.clientHeight;
+        const observer = new ResizeObserver((entries) => {
+            console.log(
+                `resized: ${entries[0].contentRect.width} x ${entries[0].contentRect.height}`
+            );
+            const { width, height } = entries[0].contentRect;
+
+            if (!camera || !renderer) return;
+
+            camera.aspect = width / height;
             camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        };
-        window.addEventListener('resize', onResize);
+
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+        });
+        observer.observe(container);
 
         const listener = (e: WheelEvent) => e.preventDefault();
         container.addEventListener('wheel', listener, { passive: false });
@@ -163,18 +176,26 @@ export function SimulationThreeCanvas() {
         rafId = requestAnimationFrame(animate);
 
         return () => {
-            window.removeEventListener('resize', onResize);
-            renderer.dispose();
-            container.removeChild(renderer.domElement);
-            container.removeEventListener('wheel', listener);
+            observer.disconnect();
+
             cancelAnimationFrame(rafId);
+
+            container.removeEventListener('wheel', listener);
+
+            if (renderer.domElement.parentNode === container)
+                container.removeChild(renderer.domElement);
+            renderer.dispose();
+            renderer.forceContextLoss();
         };
     }, []);
 
     return (
         <div
             ref={containerRef}
-            className="w-full h-full cursor-grab active:cursor-grabbing select-none touch-none"
+            className={cn(
+                'w-full h-full cursor-grab active:cursor-grabbing select-none touch-none',
+                !mouseMoved && 'cursor-none'
+            )}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}

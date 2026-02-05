@@ -1,6 +1,11 @@
+import { useLorenzStore } from '@/lib/simulation/store';
 import { cn } from '@/lib/utils';
 
 export default function SiteTitle({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+    const { hideUI } = useLorenzStore();
+
+    if (hideUI) return null;
+
     return (
         <div
             className={cn(

@@ -24,5 +24,5 @@ export interface CameraPan {
     z: number;
 }
 
-export type MaxPointsSelections = 2500 | 5000 | 10000 | 20000 | 30000;
+export type MaxPointsSelections = 2500 | 5000 | 10000 | 20000 | 30000 | 50000 | 100000;
 export type SpeedSelections = 0.5 | 1 | 2;

@@ -66,7 +66,9 @@ export const paramBounds = {
     dt: { max: 0.05, min: 0.001, step: 0.001 },
 };
 
-export const maxPointsOptions: MaxPointsSelections[] = [2500, 5000, 10000, 20000, 30000];
+export const maxPointsOptions: MaxPointsSelections[] = [
+    2500, 5000, 10000, 20000, 30000, 50000, 100000,
+];
 export const defaultMaxPoints = 10000;
 
 export const speedOptions: SpeedSelections[] = [0.5, 1, 2];
