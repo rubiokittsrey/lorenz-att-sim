@@ -86,43 +86,6 @@ The classic parameters (σ=10, ρ=28, β=8/3) produce the iconic butterfly shape
 - ρ > 24.74: Chaotic behavior
 - ρ ≈ 99.65: Period-doubling cascade
 
-## Architecture
-
-### Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── layout.tsx         # Root layout with theme provider
-│   ├── page.tsx           # Main simulation page
-│   └── globals.css        # Global styles
-├── components/
-│   ├── simulation/        # 3D visualization components
-│   ├── panel/             # Control panel components
-│   └── ui/                # Reusable UI components (shadcn/ui)
-└── lib/
-    └── simulation/        # Core simulation logic
-        ├── engine.ts      # Update loop
-        ├── lorenz-utils.ts # Lorenz equations
-        ├── store.ts       # Zustand state management
-        └── three-utils.ts # Three.js helpers
-```
-
-### Technologies
-
-- **Next.js 16** - React framework with App Router
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Three.js** - 3D graphics
-- **@react-three/fiber** - React renderer for Three.js
-- **@react-three/drei** - Three.js helpers
-- **Zustand** - State management
-- **shadcn/ui** - Re-usable component library
-- **Tailwind CSS** - Styling
-- **Radix UI** - Accessible component primitives
-- **Framer Motion** - Animations
-- **Lucide React** - Icons
-
 ### Mathematics
 
 The simulation implements the Lorenz system:
@@ -135,7 +98,7 @@ dz/dt = xy - βz
 
 Numerical integration uses Euler's method for efficient real-time calculation.
 
-## Performance
+### Performance
 
 The application employs several optimizations to maintain 60 FPS:
 
@@ -143,42 +106,7 @@ The application employs several optimizations to maintain 60 FPS:
 - WebGL instancing for efficient point cloud rendering
 - Selective geometry updates only when necessary
 - Pre-computed color gradients reduce CPU overhead
-- Efficient state management with Zustand
-
-## Use Cases
-
-- **Education**: Visualize chaos theory and differential equations
-- **Research**: Explore parameter spaces and trajectory characteristics
-- **Art**: Create aesthetic mathematical visualizations
-- **Demonstrations**: Interactive exhibits for museums or classrooms
-
-## Contributing
-
-Contributions welcome! Potential improvements include:
-
-- WebGPU implementation for enhanced performance
-- Additional attractors (Rössler, Chen, etc.)
-- Trajectory export as data or images
-- Enhanced mobile touch controls
-- Audio sonification of dynamics
-
-To contribute:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/improvement`)
-3. Commit your changes (`git commit -am 'Add improvement'`)
-4. Push to the branch (`git push origin feature/improvement`)
-5. Open a Pull Request
-
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Edward Lorenz for discovering the Lorenz system in 1963
-- Three.js and React Three Fiber communities
-- Open source contributors and maintainers
+- State management with Zustand
 
 ## Further Reading
 
@@ -189,4 +117,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Author**: Kitts Rey Rubio - [GitHub](https://github.com/rubiokittsrey)
+**Author**: [@rubiokittsrey](https://github.com/rubiokittsrey)
