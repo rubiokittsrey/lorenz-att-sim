@@ -83,19 +83,21 @@ interface VisualizationActions {
 }
 
 interface Preferences {
-    hideUI: boolean;
+    autoHideUI: boolean;
     hidePanel: boolean;
     hideStats: boolean;
+    hideCamInfo: boolean;
     maxPoints: MaxPointsSelections;
 
-    toggleUI: () => void;
+    toggleAutoHideUI: () => void;
     toggleStats: () => void;
+    toggleCamInfo: () => void;
     setMaxPoints: (points: MaxPointsSelections) => void;
     togglePanel: () => void;
 
     //misc
-    mouseMoved: boolean;
-    setMouseMoved: (t: boolean) => void;
+    pointerIdle: boolean;
+    setPointerIdle: (t: boolean) => void;
 }
 
 export type LorenzStore = LorenzSimulationStates &
@@ -106,7 +108,7 @@ export type LorenzStore = LorenzSimulationStates &
     VisualizationActions &
     Preferences;
 
-export const useLorenzStore = create<LorenzStore>((set) => ({
+export const useLorenzStore = create<LorenzStore>((set, get) => ({
     params: paramPresets.classic,
     isRunning: false,
     currentPoint: initialPoint,
@@ -180,10 +182,10 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
         }),
     clearPreset: () => set({ currentPreset: '' }),
 
-    hideUI: false,
+    autoHideUI: false,
     hideStats: true,
     maxPoints: defaultMaxPoints,
-    toggleUI: () => set((state) => ({ hideUI: !state.hideUI })),
+    toggleAutoHideUI: () => set((state) => ({ autoHideUI: !state.autoHideUI })),
     toggleStats: () => set((state) => ({ hideStats: !state.hideStats })),
     setMaxPoints: (points) => set({ maxPoints: points }),
 
@@ -193,6 +195,9 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
     hidePanel: false,
     togglePanel: () => set((state) => ({ hidePanel: !state.hidePanel })),
 
-    mouseMoved: false,
-    setMouseMoved: (t) => set({ mouseMoved: t }),
+    hideCamInfo: true,
+    toggleCamInfo: () => set((state) => ({ hideCamInfo: !state.hideCamInfo })),
+
+    pointerIdle: false,
+    setPointerIdle: (t) => set({ pointerIdle: t }),
 }));

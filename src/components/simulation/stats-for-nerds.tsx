@@ -7,7 +7,6 @@ export default function StatsForNerds({
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
     const { hideStats } = useLorenzStore();
-
     if (hideStats) return null;
 
     return (
@@ -67,6 +66,10 @@ export function RenderSpeed() {
 }
 
 export function CameraInformation() {
+    const { hideCamInfo } = useLorenzStore();
+
+    if (hideCamInfo) return null;
+
     return (
         <div className="flex flex-col space-y-3 bg-input/50 p-3 border rounded pointer-events-auto">
             <h4 className="text-sm select-none">Camera Information</h4>

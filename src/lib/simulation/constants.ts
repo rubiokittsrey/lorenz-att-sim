@@ -73,3 +73,4 @@ export const defaultMaxPoints = 10000;
 
 export const speedOptions: SpeedSelections[] = [0.5, 1, 2];
 export const defaultSpeed = 1;
+export const pointerIdleWaitPeriod = 5; //seconds

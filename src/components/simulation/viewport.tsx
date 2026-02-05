@@ -49,10 +49,8 @@ export function SimulationThreeCanvas() {
     const bufferRef = useRef(new CircularBuffer(defaultMaxPoints));
     const currentPointRef = useRef<Point3D>({ x: 0.1, y: 0, z: 0 });
 
-    // maxPoint sub
-    const maxPoints = useLorenzStore((state) => state.maxPoints);
-
-    const mouseMoved = useLorenzStore((state) => state.mouseMoved);
+    // store subs
+    const { maxPoints, pointerIdle, autoHideUI, hidePanel } = useLorenzStore();
 
     const { handleMouseDown, handleMouseMove, handleMouseUp, handleWheel } = useCameraControls();
     const getFps = createFpsCounter();
@@ -119,9 +117,6 @@ export function SimulationThreeCanvas() {
         line2Ref.current = line2;
 
         const observer = new ResizeObserver((entries) => {
-            console.log(
-                `resized: ${entries[0].contentRect.width} x ${entries[0].contentRect.height}`
-            );
             const { width, height } = entries[0].contentRect;
 
             if (!camera || !renderer) return;
@@ -194,7 +189,7 @@ export function SimulationThreeCanvas() {
             ref={containerRef}
             className={cn(
                 'w-full h-full cursor-grab active:cursor-grabbing select-none touch-none',
-                !mouseMoved && 'cursor-none'
+                autoHideUI && pointerIdle && hidePanel && 'cursor-none'
             )}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}

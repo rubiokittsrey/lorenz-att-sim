@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip';
 import { Button } from '../ui/button';
 import { GridIcon, Move3DIcon, SquareChevronLeftIcon, SquareChevronRightIcon } from 'lucide-react';
@@ -9,16 +8,12 @@ export default function GizmoToggles({
     className,
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-    const { hideUI } = useLorenzStore();
-
     return (
-        <div {...props} className={cn(className, 'flex flex-row space-x-5')}>
-            {!hideUI && (
-                <div className="flex flex-row space-x-2">
-                    <AxesToggle />
-                    <GridToggle />
-                </div>
-            )}
+        <div {...props} className={cn('flex flex-row space-x-5', className)}>
+            <div className="flex flex-row space-x-2">
+                <AxesToggle />
+                <GridToggle />
+            </div>
             <PanelToggle />
         </div>
     );
@@ -67,17 +62,14 @@ export function GridToggle() {
 }
 
 export function PanelToggle() {
-    const { hidePanel, hideUI, mouseMoved, togglePanel } = useLorenzStore();
+    const { hidePanel, togglePanel } = useLorenzStore();
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
                     variant={'secondary'}
-                    className={cn(
-                        'opacity-50 hover:opacity-100',
-                        hideUI && !mouseMoved && 'opacity-0'
-                    )}
+                    className={cn('opacity-50 hover:opacity-100')}
                     onClick={togglePanel}
                 >
                     {hidePanel ? <SquareChevronLeftIcon /> : <SquareChevronRightIcon />}

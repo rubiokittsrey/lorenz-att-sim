@@ -17,8 +17,9 @@ export default function Preferences() {
                 </h3>
             </div>
             <div className="flex flex-col space-y-3">
-                <ShowControlsSwitch />
+                <AutoHideSwitch />
                 <ShowStatsSwitch />
+                <ShowCameraInformationSwitch />
                 <ThemeSwitch />
             </div>
             <MaxPoints />
@@ -27,39 +28,36 @@ export default function Preferences() {
 }
 
 export function ShowStatsSwitch() {
-    const { hideStats, hideUI, toggleStats } = useLorenzStore();
+    const { hideStats, toggleStats } = useLorenzStore();
 
     return (
-        <div className="flex flex-col space-y-3">
-            <div className="flex flex-row space-x-3 items-center">
-                <Switch
-                    disabled={hideUI}
-                    checked={!hideStats}
-                    onCheckedChange={toggleStats}
-                    size="sm"
-                />
-                <p>Show stats for nerds</p>
-            </div>
+        <div className="flex flex-row space-x-3 items-center">
+            <Switch checked={!hideStats} onCheckedChange={toggleStats} size="sm" />
+            <p>Show stats for nerds</p>
         </div>
     );
 }
 
-export function ShowControlsSwitch() {
-    const { hideUI, toggleUI, hideStats, toggleStats } = useLorenzStore();
+export function ShowCameraInformationSwitch() {
+    const { hideStats, toggleCamInfo, hideCamInfo } = useLorenzStore();
+
+    if (hideStats) return null;
 
     return (
-        <div className="flex flex-col space-y-3">
-            <div className="flex flex-row space-x-3 items-center">
-                <Switch
-                    checked={hideUI}
-                    onCheckedChange={() => {
-                        toggleUI();
-                        if (!hideStats) toggleStats();
-                    }}
-                    size="sm"
-                />
-                <p>Hide User Interface</p>
-            </div>
+        <div className="flex flex-row space-x-3 items-center">
+            <Switch checked={!hideCamInfo} onCheckedChange={toggleCamInfo} size="sm" />
+            <p>Show camera information</p>
+        </div>
+    );
+}
+
+export function AutoHideSwitch() {
+    const { autoHideUI, toggleAutoHideUI } = useLorenzStore();
+
+    return (
+        <div className="flex flex-row space-x-3 items-center">
+            <Switch checked={autoHideUI} onCheckedChange={toggleAutoHideUI} size="sm" />
+            <p>Auto-hide UI on panel closed</p>
         </div>
     );
 }
@@ -75,15 +73,13 @@ export function ThemeSwitch() {
     if (!mounted) return null;
 
     return (
-        <div className="flex flex-col space-y-3">
-            <div className="flex flex-row space-x-3 items-center">
-                <Switch
-                    checked={theme === 'dark'}
-                    onCheckedChange={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
-                    size="sm"
-                />
-                <p>Dark Mode</p>
-            </div>
+        <div className="flex flex-row space-x-3 items-center">
+            <Switch
+                checked={theme === 'dark'}
+                onCheckedChange={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
+                size="sm"
+            />
+            <p>Dark Mode</p>
         </div>
     );
 }

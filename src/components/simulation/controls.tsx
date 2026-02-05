@@ -19,10 +19,6 @@ export default function SimulationControls({
     className,
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-    const { hideUI } = useLorenzStore();
-
-    if (hideUI) return null;
-
     return (
         <div {...props} className={cn(className, 'flex flex-row space-x-6')}>
             <div className="flex flex-row space-x-2">

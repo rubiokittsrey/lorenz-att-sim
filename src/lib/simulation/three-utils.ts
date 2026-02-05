@@ -51,7 +51,7 @@ export function createScene(): THREE.Scene {
 }
 
 export function createCamera(width: number, height: number): THREE.PerspectiveCamera {
-    return new THREE.PerspectiveCamera(60, width / height, 0.1, 2000);
+    return new THREE.PerspectiveCamera(60, width / height, 0.01, 2000);
 }
 
 export function updateCamera(camera: THREE.PerspectiveCamera): void {
