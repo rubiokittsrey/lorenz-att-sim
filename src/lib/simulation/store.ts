@@ -17,6 +17,7 @@ import {
     paramPresets,
     pathColors,
 } from './constants';
+import { Vector3 } from 'three';
 
 interface LorenzSimulationStates {
     params: LorenzParams;
@@ -36,6 +37,9 @@ interface CameraStates {
     cameraDistance: number;
     cameraAngles: CameraAngles;
     cameraPan: CameraPan;
+    cameraRoll: number;
+    cameraPosition: Point3D;
+    cameraBasisVectors: { right: Vector3; up: Vector3; forward: Vector3 };
 }
 
 interface VisualizationStates {
@@ -64,7 +68,10 @@ interface CameraActions {
     setCameraDistance: (distance: number) => void;
     setCameraAngles: (angles: CameraAngles) => void;
     setCameraPan: (pan: CameraPan) => void;
+    setCameraRoll: (roll: number) => void;
     resetCamera: () => void;
+    updateCameraPosition: (position: Point3D) => void;
+    updateCameraBasisVectors: (right: Vector3, up: Vector3, forward: Vector3) => void;
 }
 
 interface VisualizationActions {
@@ -138,7 +145,15 @@ export const useLorenzStore = create<LorenzStore>((set) => ({
             cameraAngles: initialCameraAngles,
             cameraDistance: initialCameraDistance,
             cameraPan: initialCameraPan,
+            cameraRoll: 0,
         }),
+    cameraPosition: { x: 0, y: 0, z: 0 },
+    updateCameraPosition: (position) => set({ cameraPosition: position }),
+    cameraBasisVectors: { right: new Vector3(), up: new Vector3(), forward: new Vector3() },
+    updateCameraBasisVectors: (right, up, forward) =>
+        set({ cameraBasisVectors: { right, up, forward } }),
+    cameraRoll: 0,
+    setCameraRoll: (roll) => set({ cameraRoll: roll }),
 
     setVisualMode: (mode) => set({ visualMode: mode }),
     setDotSize: (size) => set({ dotSize: size }),

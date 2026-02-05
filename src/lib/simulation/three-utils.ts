@@ -55,7 +55,14 @@ export function createCamera(width: number, height: number): THREE.PerspectiveCa
 }
 
 export function updateCamera(camera: THREE.PerspectiveCamera): void {
-    const { cameraAngles, cameraDistance, cameraPan } = useLorenzStore.getState();
+    const {
+        cameraAngles,
+        cameraDistance,
+        cameraPan,
+        cameraRoll,
+        updateCameraPosition,
+        updateCameraBasisVectors,
+    } = useLorenzStore.getState();
 
     const { theta, phi } = cameraAngles;
     const d = cameraDistance;
@@ -66,7 +73,31 @@ export function updateCamera(camera: THREE.PerspectiveCamera): void {
         d * Math.cos(phi) + pan.y,
         d * Math.sin(phi) * Math.sin(theta) + pan.z
     );
+
+    camera.up.set(0, 1, 0);
+
+    if (cameraRoll !== 0) {
+        const viewDir = new THREE.Vector3();
+        viewDir.subVectors(pan, camera.position).normalize();
+
+        const q = new THREE.Quaternion();
+        q.setFromAxisAngle(viewDir, cameraRoll);
+        camera.up.applyQuaternion(q);
+    }
+
     camera.lookAt(pan.x, pan.y, pan.z);
+    camera.updateMatrixWorld(true);
+
+    // extract and store ref for basis vectors (necessary for panning offset in useCameraControls())
+    const right = new THREE.Vector3();
+    camera.getWorldDirection(right).cross(camera.up).normalize(); // right = forward × up
+    const up = camera.up.clone();
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward).negate();
+    updateCameraBasisVectors(right, up, forward);
+
+    // update cam pos reference
+    updateCameraPosition({ x: camera.position.x, y: camera.position.y, z: camera.position.z });
 }
 
 // add grid and axes helpers to the scene
@@ -74,8 +105,8 @@ export function addHelpers(scene: THREE.Scene): {
     grid: THREE.GridHelper;
     axes: THREE.AxesHelper;
 } {
-    const grid = new THREE.GridHelper(200, 40, 0x444444, 0x222222);
-    const axes = new THREE.AxesHelper(80);
+    const grid = new THREE.GridHelper(180, 40, 0x444444, 0x222222);
+    const axes = new THREE.AxesHelper(90);
     scene.add(grid, axes);
     return { grid, axes };
 }
