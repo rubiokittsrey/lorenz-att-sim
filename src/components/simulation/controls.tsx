@@ -1,4 +1,5 @@
 import {
+    LoaderCircleIcon,
     PauseIcon,
     PlayIcon,
     RabbitIcon,
@@ -80,11 +81,17 @@ export function ResetSim() {
 }
 
 export function SaveImage() {
+    const { setCapturing, capturing } = useLorenzStore();
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button disabled variant={'secondary'} className="">
-                    <SaveIcon />
+                <Button
+                    onClick={() => setCapturing(true)}
+                    disabled={capturing}
+                    variant={'secondary'}
+                    className=""
+                >
+                    {capturing ? <LoaderCircleIcon className="animate-spin" /> : <SaveIcon />}
                 </Button>
             </TooltipTrigger>
             <TooltipContent>

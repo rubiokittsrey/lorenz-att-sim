@@ -13,6 +13,7 @@ import {
     createLineGeometries,
     createRenderer,
     createScene,
+    takeSnapshot,
     updateCamera,
 } from '@/lib/simulation/three-utils';
 
@@ -166,6 +167,11 @@ export function SimulationThreeCanvas() {
             if (renderer && scene && camera) {
                 renderer.render(scene, camera);
             }
+
+            if (state.capturing && line1 && line2) {
+                handleSnapshot();
+                state.setCapturing(false);
+            }
         };
 
         rafId = requestAnimationFrame(animate);
@@ -183,6 +189,14 @@ export function SimulationThreeCanvas() {
             renderer.forceContextLoss();
         };
     }, []);
+
+    const handleSnapshot = () => {
+        if (!rendererRef.current || !sceneRef.current || !cameraRef.current) {
+            return;
+        }
+
+        takeSnapshot(rendererRef.current, sceneRef.current, cameraRef.current);
+    };
 
     return (
         <div

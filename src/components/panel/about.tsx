@@ -1,5 +1,6 @@
 import { CircleQuestionMarkIcon, CopyrightIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { maxPointsOptions } from '@/lib/simulation/constants';
 
 export default function About() {
     const tabs = ['project', 'lorenz', 'guide'];
@@ -54,7 +55,9 @@ export function ProjectTab() {
                 <ul className="list-disc list-inside space-y-1 ml-2">
                     <li>Interactive 3D camera controls</li>
                     <li>Adjustable parameters (σ, ρ, β, dt) and simulation speed</li>
-                    <li>Trail rendering up to 30,000 points</li>
+                    <li>
+                        Trail rendering up to {maxPointsOptions[maxPointsOptions.length - 1]} points
+                    </li>
                     <li>Multiple color gradient options</li>
                     <li>Grid and axes helpers</li>
                 </ul>

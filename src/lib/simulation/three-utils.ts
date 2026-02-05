@@ -3,7 +3,10 @@ import { CircularBuffer } from './lorenz-utils';
 import { useLorenzStore } from './store';
 
 export function createRenderer(width: number, height: number): THREE.WebGLRenderer {
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        preserveDrawingBuffer: true,
+    });
     renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio);
     return renderer;
@@ -46,7 +49,7 @@ export function markGeometryForUpdate(line1: THREE.Line, line2: THREE.Line): voi
 
 export function createScene(): THREE.Scene {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0a14);
+    scene.background = new THREE.Color(0x0a0a0b);
     return scene;
 }
 
@@ -130,3 +133,62 @@ export function createLineGeometries(buffer: CircularBuffer): {
 
     return { line1, line2 };
 }
+
+export const takeSnapshot = (
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    contrastBoost: number = 1,
+    scale: number = 3
+) => {
+    const originalSize = renderer.getSize(new THREE.Vector2());
+
+    // scale by scale factor for high res output + update cam aspect
+    renderer.setSize(originalSize.x * scale, originalSize.y * scale, false);
+    if (camera instanceof THREE.PerspectiveCamera) {
+        camera.aspect = originalSize.x / originalSize.y;
+        camera.updateProjectionMatrix();
+    }
+
+    renderer.render(scene, camera);
+
+    const canvas = renderer.domElement;
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d')!;
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+
+    ctx.drawImage(canvas, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+    const data = imageData.data;
+    const factor = (259 * (contrastBoost * 100 + 255)) / (255 * (259 - contrastBoost * 100));
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = factor * (data[i] - 128) + 128; // R
+        data[i + 1] = factor * (data[i + 1] - 128) + 128; // G
+        data[i + 2] = factor * (data[i + 2] - 128) + 128; // B
+
+        data[i] = Math.max(0, Math.min(255, data[i]));
+        data[i + 1] = Math.max(0, Math.min(255, data[i + 1]));
+        data[i + 2] = Math.max(0, Math.min(255, data[i + 2]));
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    const dataURL = tempCanvas.toDataURL('image/png');
+
+    // restore size and aspect
+    renderer.setSize(originalSize.x, originalSize.y, false);
+    if (camera instanceof THREE.PerspectiveCamera) {
+        camera.updateProjectionMatrix();
+    }
+
+    const link = document.createElement('a');
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0]; // 2026-02-06
+    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // 14-30-45
+    link.download = `lorenz-${dateStr}_${timeStr}.png`;
+    link.href = dataURL;
+    link.click();
+};

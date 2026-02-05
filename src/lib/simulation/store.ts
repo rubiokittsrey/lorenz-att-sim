@@ -40,6 +40,7 @@ interface CameraStates {
     cameraRoll: number;
     cameraPosition: Point3D;
     cameraBasisVectors: { right: Vector3; up: Vector3; forward: Vector3 };
+    capturing: boolean;
 }
 
 interface VisualizationStates {
@@ -72,6 +73,7 @@ interface CameraActions {
     resetCamera: () => void;
     updateCameraPosition: (position: Point3D) => void;
     updateCameraBasisVectors: (right: Vector3, up: Vector3, forward: Vector3) => void;
+    setCapturing: (t: boolean) => void;
 }
 
 interface VisualizationActions {
@@ -200,4 +202,7 @@ export const useLorenzStore = create<LorenzStore>((set, get) => ({
 
     pointerIdle: false,
     setPointerIdle: (t) => set({ pointerIdle: t }),
+
+    capturing: false,
+    setCapturing: (t) => set({ capturing: t }),
 }));
